@@ -23,6 +23,7 @@ class WebSearch:
         self.__chathistory = [SystemMessage(content=f"You are an helpful assistant,answer the user query like an knowledge guide from the provided")]
         self.threshold = 1.0
         self.persist_path = persist_path
+        self.extracted_query = "",
         self.vectorstore = self._load_vectorstore()
     
     def _load_vectorstore(self):
@@ -41,31 +42,31 @@ class WebSearch:
 
 
     def answer_qeury(self, query):
-        extracted_query,link= self.extract_link_query(query)
-        print("query",extracted_query)
+        self.extracted_query,link= self.extract_link_query(query)
+        print("query",self.extracted_query)
         print("link",link)
         
         if link != None:
             if not self.url_already_in_store(link):
-                retrieved_content = self.document_laod(link,extracted_query)
+                retrieved_content = self.document_laod(link)
                 if retrieved_content != None:
                     print("answering from vector store")
-                    self.llm_conn(extracted_query,retrieved_content)
+                    self.llm_conn(self.extracted_query,retrieved_content)
                 else:
                     print("answering from duckducgo 1")
-                    self.duckduckgo_function(extracted_query)
+                    self.duckduckgo_function(self.extracted_query)
             else:
-                retrieved_text_from_vec= self.retriever_and_score(extracted_query)
+                retrieved_text_from_vec= self.retriever_and_score(self.extracted_query)
                 print("answering from vector store")
-                self.llm_conn(extracted_query, retrieved_text_from_vec)
+                self.llm_conn(self.extracted_query, retrieved_text_from_vec)
         else:
-            retrieved_text_from_query = self.retriever_and_score(extracted_query)
+            retrieved_text_from_query = self.retriever_and_score(self.extracted_query)
             if retrieved_text_from_query != None:
                 print("answering from vector store")
-                self.llm_conn(extracted_query, retrieved_text_from_query)
+                self.llm_conn(self.extracted_query, retrieved_text_from_query)
             else:
                 print("answering from duckducgo 2")
-                self.duckduckgo_function(extracted_query)
+                self.duckduckgo_function(self.extracted_query)
             
     
     def extract_link_query(self,query):
@@ -110,7 +111,7 @@ class WebSearch:
         return any(link == doc.metadata.get("source") for doc in results)
         
     
-    def document_laod(self,link,extracted_query):
+    def document_laod(self,link):
         loader = RecursiveUrlLoader(
             url=link,
             max_depth=1,
@@ -121,7 +122,7 @@ class WebSearch:
         splitted_text = self.text_splitter(docs,link) 
         self.create_vector_store(splitted_text)
 
-        content = self.retriever_and_score(extracted_query)
+        content = self.retriever_and_score(self.extracted_query)
         return content
 
 
@@ -154,6 +155,6 @@ class WebSearch:
 
 web = WebSearch()
 
-web.answer_qeury("what is ai?")
+web.answer_qeury("https://www.geeksforgeeks.org/machine-learning/k-nearest-neighbours/")
 
 

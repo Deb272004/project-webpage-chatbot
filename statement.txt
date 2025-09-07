@@ -1,5 +1,5 @@
-user query if is link 
-   - link load 
+user query if is with link 
+   - link -> extract link and query 
    - splitting of the doc
    - embedding -> vectordb
    - retrieval
