@@ -1,0 +1,9 @@
+user query if is link 
+   - link load 
+   - splitting of the doc
+   - embedding -> vectordb
+   - retrieval
+   - query and retrieved context -> response
+
+if not use tool of duckduckgo to response
+
