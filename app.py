@@ -16,7 +16,7 @@ load_dotenv()
 
 class WebSearch:
     
-    def __init__(self, persist_path="project-webpage_chatbot/vectorstore_index"):
+    def __init__(self, persist_path="vectorstore_index"):
         print("welcome to the chatbot how can i help you")
         self.api_key = os.getenv("groq_api")
         self.google_api_key = os.getenv("gemini_api")
