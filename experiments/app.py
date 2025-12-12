@@ -8,8 +8,14 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import RecursiveUrlLoader
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_ollama import OllamaEmbeddings#
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface.embeddings import HuggingFaceEndpointEmbeddings
+
+
+
 import os
 
 load_dotenv()
@@ -20,6 +26,7 @@ class WebSearch:
         print("welcome to the chatbot how can i help you")
         self.api_key = os.getenv("groq_api")
         self.google_api_key = os.getenv("gemini_api")
+        self.hugging_face_key = os.getenv("HUGGING_FACE_HUB_API_TOKEN")
         self.__chathistory = [SystemMessage(content=f"You are an helpful assistant,answer the user query like an knowledge guide from the provided")]
         self.threshold = 1.0
         self.persist_path = persist_path
@@ -29,7 +36,11 @@ class WebSearch:
     def _load_vectorstore(self):
         if os.path.exists(self.persist_path):
             print("loading info from existing vector store")
-            embedding = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=self.google_api_key)
+            # embedding = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=self.google_api_key)
+            # embedding = OllamaEmbeddings(model='mistral')
+            
+            embedding = HuggingFaceEndpointEmbeddings(model="jinaai/jina-embeddings-v4", huggingfacehub_api_token=self.hugging_face_key)
+            
             return FAISS.load_local(self.persist_path, embedding, allow_dangerous_deserialization=True)
         print("no info found")
         return None
